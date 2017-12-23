@@ -62,7 +62,7 @@ func HandlePacket(data []byte) error {
 	case PushAck:
 		return handlePushAck(data)
 	default:
-		return errors.New(fmt.Sprintf("unknown packet type: %v", pType))
+		return errors.New(fmt.Sprintf("unknown packet type: %s", pType))
 	}
 }
 
