@@ -35,7 +35,7 @@ var (
 	snapshot_len int32  = 65535
 	promiscuous  bool   = false
 	err          error
-	timeout      time.Duration = 30 * time.Second
+	timeout      time.Duration = -1 * time.Second
 	handle       *pcap.Handle
 )
 
@@ -50,26 +50,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("test called")
-
-		//// Find all devices
-		//devices, err := pcap.FindAllDevs()
-		//if err != nil {
-		//	log.WithError(err).Fatal("finding devices")
-		//}
-		//
-		//// Print device information
-		//fmt.Println("Devices found:")
-		//for _, device := range devices {
-		//	fmt.Println("\nName: ", device.Name)
-		//	fmt.Println("Description: ", device.Description)
-		//	fmt.Println("Devices addresses: ", device.Description)
-		//	for _, address := range device.Addresses {
-		//		fmt.Println("- IP address: ", address.IP)
-		//		fmt.Println("- Subnet mask: ", address.Netmask)
-		//	}
-		//}
-
 		// Open device
 		handle, err = pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
 		if err != nil {
@@ -89,9 +69,12 @@ to quickly create a Cobra application.`,
 		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 		for packet := range packetSource.Packets() {
 			// Process packet here
-			fmt.Println(packet)
+			//fmt.Println(packet)
 			data := packet.TransportLayer().LayerPayload()
-			fmt.Println(data)
+			//fmt.Println(data)
+			if len(data) > 12 {
+				fmt.Println(string(data[12:]))
+			}
 		}
 	},
 }
@@ -109,33 +92,3 @@ func init() {
 	// is called directly, e.g.:
 	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-//func udpServer() {
-//	addr, err := net.ResolveUDPAddr("udp", "0.0.0.0:1700")
-//	if err != nil {
-//		log.WithError(err).Fatal("failed to resolve udp address")
-//	}
-//	log.WithField("addr", addr).Info("starting gateway udp listener")
-//
-//	pc, err := net.ListenUDP("udp", addr)
-//	if err != nil {
-//		log.WithError(err).Fatal("failed to start listener")
-//	}
-//	defer pc.Close()
-//
-//	buf := make([]byte, 65507)
-//
-//	for {
-//		i, addr, err := pc.ReadFromUDP(buf)
-//		if err != nil {
-//			log.WithError(err).Error("udp read error")
-//		}
-//		data := make([]byte, i)
-//		copy(data, buf[:i])
-//		log.WithFields(log.Fields{
-//			"addr":         addr,
-//			"data":         data,
-//			"string(data)": string(data),
-//		}).Info("received udp message")
-//	}
-//}
