@@ -40,6 +40,7 @@ const (
 	PushAck
 )
 
+// Protocol versions
 const (
 	ProtoVersion1 uint8 = 0x01
 	ProtoVersion2 uint8 = 0x02
