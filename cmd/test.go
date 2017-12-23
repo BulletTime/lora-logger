@@ -76,7 +76,8 @@ to quickly create a Cobra application.`,
 			//}
 			err := protocol.HandlePacket(data)
 			if err != nil {
-				log.WithError(err).Error("protocol error")
+				ctx := log.WithField("data", data)
+				ctx.WithError(err).Error("protocol error")
 			}
 		}
 	},
