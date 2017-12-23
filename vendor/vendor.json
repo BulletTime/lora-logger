@@ -15,20 +15,14 @@
 			"revisionTime": "2017-07-26T18:07:45Z"
 		},
 		{
-			"checksumSHA1": "rkMrOC6qQhEkDCYmmUErg8qvjGA=",
-			"path": "github.com/apex/log/handlers/json",
-			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
-			"revisionTime": "2017-07-26T18:07:45Z"
-		},
-		{
-			"checksumSHA1": "AHCiF3VnEqmXyZDeH+z/IGsAtnI=",
-			"path": "github.com/apex/log/handlers/level",
-			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
-			"revisionTime": "2017-07-26T18:07:45Z"
-		},
-		{
 			"checksumSHA1": "rxQUkWqruIZKpRzdwqrkxfcZvyw=",
 			"path": "github.com/apex/log/handlers/multi",
+			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
+			"revisionTime": "2017-07-26T18:07:45Z"
+		},
+		{
+			"checksumSHA1": "+urkX0ZY02ty7TvsBsYzcboRxVg=",
+			"path": "github.com/apex/log/handlers/text",
 			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
 			"revisionTime": "2017-07-26T18:07:45Z"
 		},

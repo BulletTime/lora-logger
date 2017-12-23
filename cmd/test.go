@@ -21,22 +21,22 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/apex/log"
+	"github.com/bullettime/lora-logger/protocol"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/spf13/cobra"
 )
 
 var (
-	device       string = "eth0"
-	snapshot_len int32  = 65535
-	promiscuous  bool   = false
-	err          error
-	timeout      time.Duration = -1 * time.Second
-	handle       *pcap.Handle
+	device            = "eth0"
+	snapshotLen int32 = 65535
+	promiscuous       = false
+	err         error
+	timeout     = -1 * time.Second
+	handle      *pcap.Handle
 )
 
 // testCmd represents the test command
@@ -51,19 +51,18 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Open device
-		handle, err = pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
+		handle, err = pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
 		if err != nil {
 			log.WithError(err).Fatal("open device failed")
 		}
 		defer handle.Close()
 
 		// Set filter
-		var filter string = "udp and port 1700"
+		filter := "udp and port 1700"
 		err = handle.SetBPFFilter(filter)
 		if err != nil {
 			log.WithError(err).Fatal("filter failed")
 		}
-		fmt.Println("Only capturing UDP port 1700 packets.")
 
 		// Use the handle as a packet source to process all packets
 		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
@@ -72,8 +71,12 @@ to quickly create a Cobra application.`,
 			//fmt.Println(packet)
 			data := packet.TransportLayer().LayerPayload()
 			//fmt.Println(data)
-			if len(data) > 12 {
-				fmt.Println(string(data[12:]))
+			//if len(data) > 12 {
+			//	fmt.Println(string(data[12:]))
+			//}
+			err := protocol.HandlePacket(data)
+			if err != nil {
+				log.WithError(err).Error("protocol error")
 			}
 		}
 	},

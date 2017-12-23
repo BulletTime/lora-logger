@@ -1,4 +1,4 @@
-.PHONY: all build build-arm clean
+.PHONY: all build build-arm patch unpatch clean test
 VERSION := 0.1
 COMMIT := $(shell git describe --always)
 GOOS ?= darwin
@@ -15,14 +15,21 @@ build:
 build-arm:
 	@echo "Compiling source for linux arm-5"
 	@mkdir -p build
-	cd .docker/; ./pre-build.sh
-	mv build .build
+	@mv build .build
+	@$(MAKE) patch
 	@GOPATH=$(GOPATH) xgo -image=svenagn/multitech-libpcap -ldflags "-X main.version=$(VERSION) -X main.build=$(COMMIT)" -out .build/lora-logger --targets=linux/arm-5 .
-	mv .build build
-	cd .docker/; ./post-build.sh
+	@$(MAKE) unpatch
+	@mv .build build
+
+patch:
+	@-patch -p1 -N -f < .docker/gopacket_pcap.patch
+
+unpatch:
+	@-patch -p1 -R -f < .docker/gopacket_pcap.patch
 
 clean:
 	@echo "Cleaning up workspace"
+	@$(MAKE) unpatch
 	@rm -rf build
+	@rm -rf .build
 	@rm -rf lora.log
-

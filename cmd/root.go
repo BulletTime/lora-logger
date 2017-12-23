@@ -23,15 +23,13 @@ package cmd
 import (
 	"fmt"
 	"os"
-
 	"path/filepath"
 
 	"github.com/apex/log"
 	cliHandler "github.com/apex/log/handlers/cli"
-	jsonHandler "github.com/apex/log/handlers/json"
-	levelHandler "github.com/apex/log/handlers/level"
 	multiHandler "github.com/apex/log/handlers/multi"
-	homedir "github.com/mitchellh/go-homedir"
+	textHandler "github.com/apex/log/handlers/text"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -40,6 +38,7 @@ var (
 	cfgFile string
 	logFile *os.File
 	verbose bool
+	debug bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -53,11 +52,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		var logLevel = log.DebugLevel
+		var logLevel = log.InfoLevel
 		var logHandlers []log.Handler
 
 		if verbose {
-			logHandlers = append(logHandlers, levelHandler.New(cliHandler.Default, logLevel))
+			logHandlers = append(logHandlers, cliHandler.Default)
+		}
+
+		if debug {
+			logLevel = log.DebugLevel
 		}
 
 		absLogFileLocation, err := filepath.Abs("lora.log")
@@ -69,7 +72,7 @@ to quickly create a Cobra application.`,
 			panic(err)
 		}
 		if err == nil {
-			logHandlers = append(logHandlers, levelHandler.New(jsonHandler.New(logFile), logLevel))
+			logHandlers = append(logHandlers, textHandler.New(logFile))
 		}
 
 		log.SetHandler(multiHandler.New(logHandlers...))
@@ -110,6 +113,7 @@ func init() {
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.lora-logger.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print everything that is send to logs")
+	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable debug logs")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
