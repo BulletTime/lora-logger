@@ -1,10 +1,9 @@
-.PHONY: build clean
-#PKGS := $(shell go list ./... | grep -v /vendor/)
+.PHONY: build build-arm clean
 VERSION := 0.1
-COMMIT := unknown #VERSION := $(shell git describe --always)
+COMMIT := $(shell git describe --always)
 GOOS ?= darwin
 GOARCH ?= amd64
-GOPATH ?= /Users/sven/go/
+GOPATH ?= $(HOME)/go/
 
 build:
 	@echo "Compiling source for $(GOOS) $(GOARCH)"
@@ -16,7 +15,7 @@ build-arm:
 	@mkdir -p build
 	cd .docker/; ./pre-build.sh
 	mv build .build
-	@GOPATH=$(GOPATH) xgo -image=svenagn/multitech-libpcap -out .build/lora-logger --targets=linux/arm-5 .
+	@GOPATH=$(GOPATH) xgo -image=svenagn/multitech-libpcap -ldflags "-X main.version=$(VERSION) -X main.build=$(COMMIT)" -out .build/lora-logger --targets=linux/arm-5 .
 	mv .build build
 	cd .docker/; ./post-build.sh
 
@@ -24,3 +23,4 @@ clean:
 	@echo "Cleaning up workspace"
 	@rm -rf build
 	@rm -rf lora.log
+
