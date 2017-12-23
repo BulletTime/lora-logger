@@ -1,9 +1,11 @@
-.PHONY: build build-arm clean
+.PHONY: all build build-arm clean
 VERSION := 0.1
 COMMIT := $(shell git describe --always)
 GOOS ?= darwin
 GOARCH ?= amd64
 GOPATH ?= $(HOME)/go/
+
+all: clean build build-arm
 
 build:
 	@echo "Compiling source for $(GOOS) $(GOARCH)"
