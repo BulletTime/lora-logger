@@ -24,51 +24,73 @@ package protocol
 
 import (
 	"encoding/binary"
+	"encoding/json"
+	"fmt"
 
 	"github.com/apex/log"
 	"github.com/pkg/errors"
 )
 
-// PushACKPacket is used by the server to acknowledge immediately all the
-// PUSH_DATA packets received
-type PushAckPacket struct {
+// TXACKPacket is used by the gateway to send a feedback to the server
+// to inform if a downlink request has been accepted or rejected by the
+// gateway.
+type TXAckPacket struct {
 	Protocol    uint8
 	RandomToken uint16
+	GatewayMac  [8]byte
+	Payload     TXAckPayload
 }
 
-func handlePushAck(data []byte) (Packet, error) {
-	var packet PushAckPacket
+// TXACKPayload contains the TXACKPacket payload.
+type TXAckPayload struct {
+	TXPKACK TXPKACK `json:"txpk_ack"`
+}
+
+// TXPKACK contains the status information of the associated PULL_RESP
+// packet.
+type TXPKACK struct {
+	Error string `json:"error"`
+}
+
+func handleTXAck(data []byte) (Packet, error) {
+	var packet PullAckPacket
 
 	err := packet.unmarshalData(data)
 	if err != nil {
-		return nil, errors.Wrap(err, "handle push ack packet failed")
+		return nil, errors.Wrap(err, "handle tx ack packet failed")
 	}
 
 	return &packet, nil
 }
 
-func (p *PushAckPacket) Log(ctx log.Interface) {
+func (p *TXAckPacket) Log(ctx log.Interface) {
 	ctx.WithFields(log.Fields{
-		"protocol": p.Protocol,
+		"protocol":     p.Protocol,
 		"random token": p.RandomToken,
-	}).Info("PUSH_ACK")
+		"gateway mac":  fmt.Sprintf("%X", p.GatewayMac),
+		"error":        p.Payload.TXPKACK.Error,
+	}).Info("TX_ACK")
 }
 
-func (p *PushAckPacket) unmarshalData(data []byte) error {
-	_, err := isValidPushAckPacket(data)
+func (p *TXAckPacket) unmarshalData(data []byte) error {
+	_, err := isValidTXAckPacket(data)
 	if err != nil {
-		return errors.Wrap(err, "unmarshal push ack packet failed")
+		return errors.Wrap(err, "unmarshal tx ack packet failed")
 	}
 
 	p.Protocol = data[0]
 	p.RandomToken = binary.LittleEndian.Uint16(data[1:3])
 
-	return nil
+	for i := 0; i < 8; i++ {
+		p.GatewayMac[i] = data[4+i]
+	}
+
+	return json.Unmarshal(data[12:], p.Payload)
 }
 
-func isValidPushAckPacket(data []byte) (bool, error) {
-	if len(data) != 4 {
-		return false, errors.New("invalid packet: 4 bytes expected")
+func isValidTXAckPacket(data []byte) (bool, error) {
+	if len(data) < 12 {
+		return false, errors.New("invalid packet: at least 12 bytes expected")
 	}
 
 	return true, nil

@@ -51,34 +51,34 @@ type PushDataPayload struct {
 
 // RXPK contains an RF packet and associated metadata.
 type RXPK struct {
-	Time *CompactTime `json:"time"` // time | string | UTC time of pkt RX, us precision, ISO 8601 'compact' format
-	TMMS int64        `json:"tmms"` // tmms | number | GPS time of pkt RX, number of milliseconds since 06.Jan.1980
-	TMST uint32       `json:"tmst"` // tmst | number | Internal timestamp of "RX finished" event (32b unsigned)
-	Freq float64      `json:"freq"` // freq | number | RX central frequency in MHz (unsigned float, Hz precision)
-	Chan uint8        `json:"chan"` // chan | number | Concentrator "IF" channel used for RX (unsigned integer)
-	RFCh uint8        `json:"rfch"` // rfch | number | Concentrator "RF chain" used for RX (unsigned integer)
-	Stat int8         `json:"stat"` // stat | number | CRC status: 1 = OK, -1 = fail, 0 = no CRC
-	Mod  string       `json:"modu"` // modu | string | Modulation identifier "LORA" or "FSK"
-	DatR *DataRate    `json:"datr"` // datr | string | LoRa datarate identifier (eg. SF12BW500) || datr | number | FSK datarate (unsigned, in bits per second)
-	CodR string       `json:"codr"` // codr | string | LoRa ECC coding rate identifier
-	RSSI int16        `json:"rssi"` // rssi | number | RSSI in dBm (signed integer, 1 dB precision)
-	SNR  float64      `json:"lsnr"` // lsnr | number | Lora SNR ratio in dB (signed float, 0.1 dB precision)
-	Size uint16       `json:"size"` // size | number | RF packet payload size in bytes (unsigned integer)
-	Data string       `json:"data"` // data | string | Base64 encoded RF packet payload, padded
+	Time CompactTime `json:"time"` // time | string | UTC time of pkt RX, us precision, ISO 8601 'compact' format
+	TMMS int64       `json:"tmms"` // tmms | number | GPS time of pkt RX, number of milliseconds since 06.Jan.1980
+	TMST uint32      `json:"tmst"` // tmst | number | Internal timestamp of "RX finished" event (32b unsigned)
+	Freq float64     `json:"freq"` // freq | number | RX central frequency in MHz (unsigned float, Hz precision)
+	Chan uint8       `json:"chan"` // chan | number | Concentrator "IF" channel used for RX (unsigned integer)
+	RFCh uint8       `json:"rfch"` // rfch | number | Concentrator "RF chain" used for RX (unsigned integer)
+	Stat int8        `json:"stat"` // stat | number | CRC status: 1 = OK, -1 = fail, 0 = no CRC
+	Mod  string      `json:"modu"` // modu | string | Modulation identifier "LORA" or "FSK"
+	DatR *DataRate   `json:"datr"` // datr | string | LoRa datarate identifier (eg. SF12BW500) || datr | number | FSK datarate (unsigned, in bits per second)
+	CodR string      `json:"codr"` // codr | string | LoRa ECC coding rate identifier
+	RSSI int16       `json:"rssi"` // rssi | number | RSSI in dBm (signed integer, 1 dB precision)
+	SNR  float64     `json:"lsnr"` // lsnr | number | Lora SNR ratio in dB (signed float, 0.1 dB precision)
+	Size uint16      `json:"size"` // size | number | RF packet payload size in bytes (unsigned integer)
+	Data string      `json:"data"` // data | string | Base64 encoded RF packet payload, padded
 }
 
 // Stat contains the status of the gateway.
 type Stat struct {
-	Time *ExpandedTime `json:"time"` // time | string | UTC 'system' time of the gateway, ISO 8601 'expanded' format
-	Lati float64       `json:"lati"` // lati | number | GPS latitude of the gateway in degree (float, N is +)
-	Long float64       `json:"long"` // long | number | GPS latitude of the gateway in degree (float, E is +)
-	Alti int32         `json:"alti"` // alti | number | GPS altitude of the gateway in meter RX (integer)
-	RXNb uint32        `json:"rxnb"` // rxnb | number | Number of radio packets received (unsigned integer)
-	RXOK uint32        `json:"rxok"` // rxok | number | Number of radio packets received with a valid PHY CRC
-	RXFW uint32        `json:"rxfw"` // rxfw | number | Number of radio packets forwarded (unsigned integer)
-	ACKR float64       `json:"ackr"` // ackr | number | Percentage of upstream datagrams that were acknowledged
-	DWNb uint32        `json:"dwnb"` // dwnb | number | Number of downlink datagrams received (unsigned integer)
-	TXNb uint32        `json:"txnb"` // txnb | number | Number of packets emitted (unsigned integer)
+	Time ExpandedTime `json:"time"` // time | string | UTC 'system' time of the gateway, ISO 8601 'expanded' format
+	Lati float64      `json:"lati"` // lati | number | GPS latitude of the gateway in degree (float, N is +)
+	Long float64      `json:"long"` // long | number | GPS latitude of the gateway in degree (float, E is +)
+	Alti int32        `json:"alti"` // alti | number | GPS altitude of the gateway in meter RX (integer)
+	RXNb uint32       `json:"rxnb"` // rxnb | number | Number of radio packets received (unsigned integer)
+	RXOK uint32       `json:"rxok"` // rxok | number | Number of radio packets received with a valid PHY CRC
+	RXFW uint32       `json:"rxfw"` // rxfw | number | Number of radio packets forwarded (unsigned integer)
+	ACKR float64      `json:"ackr"` // ackr | number | Percentage of upstream datagrams that were acknowledged
+	DWNb uint32       `json:"dwnb"` // dwnb | number | Number of downlink datagrams received (unsigned integer)
+	TXNb uint32       `json:"txnb"` // txnb | number | Number of packets emitted (unsigned integer)
 }
 
 // ExpandedTime implements time.Time but (un)marshals to and from
@@ -154,23 +154,27 @@ func (d *DataRate) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func handlePushData(data []byte) error {
-	var packet PushDataPacket
+func handlePushData(data []byte) (Packet, error) {
+	var pushDataPacket PushDataPacket
 
-	err := packet.unmarshalData(data)
+	err := pushDataPacket.unmarshalData(data)
 	if err != nil {
-		return errors.Wrap(err, "handle push data packet failed")
+		return nil, errors.Wrap(err, "handle push data packet failed")
 	}
 
-	log.WithFields(log.Fields{
-		"protocol":     packet.Protocol,
-		"random token": packet.RandomToken,
-		"gateway mac":  fmt.Sprintf("%X", packet.GatewayMac),
+	return &pushDataPacket, nil
+}
+
+func (p *PushDataPacket) Log(ctx log.Interface) {
+	ctx.WithFields(log.Fields{
+		"protocol":     p.Protocol,
+		"random token": p.RandomToken,
+		"gateway mac":  fmt.Sprintf("%X", p.GatewayMac),
 	}).Info("PUSH_DATA")
 
-	for _, rxpk := range packet.Payload.RXPK {
-		log.WithFields(log.Fields{
-			"time":        time.Time(*rxpk.Time),
+	for _, rxpk := range p.Payload.RXPK {
+		ctx.WithFields(log.Fields{
+			"time":        time.Time(rxpk.Time),
 			"frequency":   rxpk.Freq,
 			"IF channel":  rxpk.Chan,
 			"RF chain":    rxpk.RFCh,
@@ -181,22 +185,21 @@ func handlePushData(data []byte) error {
 			"rssi":        rxpk.RSSI,
 			"snr":         rxpk.SNR,
 			"size":        rxpk.Size,
+			"data":        rxpk.Data,
 		}).Info("PUSH_DATA: RXPK")
 	}
 
-	if packet.Payload.Stat != nil {
-		log.WithFields(log.Fields{
-			"time":                time.Time(*packet.Payload.Stat.Time),
-			"rx received":         packet.Payload.Stat.RXNb,
-			"rx ok":               packet.Payload.Stat.RXOK,
-			"rx forwarded":        packet.Payload.Stat.RXFW,
-			"upstream ack (%)":    packet.Payload.Stat.ACKR,
-			"downstream received": packet.Payload.Stat.DWNb,
-			"tx packets":          packet.Payload.Stat.TXNb,
+	if p.Payload.Stat != nil {
+		ctx.WithFields(log.Fields{
+			"time":                time.Time(p.Payload.Stat.Time),
+			"rx received":         p.Payload.Stat.RXNb,
+			"rx ok":               p.Payload.Stat.RXOK,
+			"rx forwarded":        p.Payload.Stat.RXFW,
+			"upstream ack (%)":    p.Payload.Stat.ACKR,
+			"downstream received": p.Payload.Stat.DWNb,
+			"tx ps":               p.Payload.Stat.TXNb,
 		}).Info("PUSH_DATA: STAT")
 	}
-
-	return nil
 }
 
 func (p *PushDataPacket) unmarshalData(data []byte) error {

@@ -29,35 +29,35 @@ import (
 	"github.com/pkg/errors"
 )
 
-// PushACKPacket is used by the server to acknowledge immediately all the
-// PUSH_DATA packets received
-type PushAckPacket struct {
+// PullACKPacket is used by the server to confirm that the network route is
+// open and that the server can send PULL_RESP packets at any time.
+type PullAckPacket struct {
 	Protocol    uint8
 	RandomToken uint16
 }
 
-func handlePushAck(data []byte) (Packet, error) {
-	var packet PushAckPacket
+func handlePullAck(data []byte) (Packet, error) {
+	var packet PullAckPacket
 
 	err := packet.unmarshalData(data)
 	if err != nil {
-		return nil, errors.Wrap(err, "handle push ack packet failed")
+		return nil, errors.Wrap(err, "handle pull ack packet failed")
 	}
 
 	return &packet, nil
 }
 
-func (p *PushAckPacket) Log(ctx log.Interface) {
+func (p *PullAckPacket) Log(ctx log.Interface) {
 	ctx.WithFields(log.Fields{
-		"protocol": p.Protocol,
+		"protocol":     p.Protocol,
 		"random token": p.RandomToken,
-	}).Info("PUSH_ACK")
+	}).Info("PULL_ACK")
 }
 
-func (p *PushAckPacket) unmarshalData(data []byte) error {
-	_, err := isValidPushAckPacket(data)
+func (p *PullAckPacket) unmarshalData(data []byte) error {
+	_, err := isValidPullAckPacket(data)
 	if err != nil {
-		return errors.Wrap(err, "unmarshal push ack packet failed")
+		return errors.Wrap(err, "unmarshal pull ack packet failed")
 	}
 
 	p.Protocol = data[0]
@@ -66,7 +66,7 @@ func (p *PushAckPacket) unmarshalData(data []byte) error {
 	return nil
 }
 
-func isValidPushAckPacket(data []byte) (bool, error) {
+func isValidPullAckPacket(data []byte) (bool, error) {
 	if len(data) != 4 {
 		return false, errors.New("invalid packet: 4 bytes expected")
 	}

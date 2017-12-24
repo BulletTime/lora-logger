@@ -38,21 +38,29 @@ type PacketType byte
 const (
 	PushData PacketType = iota
 	PushAck
+	PullData
+	PullResp
+	PullAck
+	TXAck
 )
 
-// Protocol versions
+// Protocol version
 const (
 	ProtoVersion1 uint8 = 0x01
 	ProtoVersion2 uint8 = 0x02
 )
 
+type Packet interface {
+	Log(ctx log.Interface)
+}
+
 // HandlePacket will check the packet and try to handle it accordingly.
 // If the packet is recognized, it will extract the data and write it to the log.
 // If there was an error of some sort, the raw data with the error will be logged.
-func HandlePacket(data []byte) error {
+func HandlePacket(data []byte) (Packet, error) {
 	_, err := isValidPacket(data)
 	if err != nil {
-		return errors.Wrap(err, "handle packet failed")
+		return nil, errors.Wrap(err, "handle packet failed")
 	}
 
 	pType := PacketType(data[3])
@@ -62,8 +70,16 @@ func HandlePacket(data []byte) error {
 		return handlePushData(data)
 	case PushAck:
 		return handlePushAck(data)
+	case PullData:
+		return handlePullData(data)
+	case PullResp:
+		return handlePullResp(data)
+	case PullAck:
+		return handlePullAck(data)
+	case TXAck:
+		return handleTXAck(data)
 	default:
-		return errors.New(fmt.Sprintf("unknown packet type: %s", pType))
+		return nil, errors.New(fmt.Sprintf("unknown packet type: %s", pType))
 	}
 }
 

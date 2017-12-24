@@ -67,18 +67,18 @@ to quickly create a Cobra application.`,
 		// Use the handle as a packet source to process all packets
 		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 		for packet := range packetSource.Packets() {
-			// Process packet here
-			//fmt.Println(packet)
 			data := packet.TransportLayer().LayerPayload()
-			//fmt.Println(data)
-			//if len(data) > 12 {
-			//	fmt.Println(string(data[12:]))
-			//}
-			err := protocol.HandlePacket(data)
+			packet, err := protocol.HandlePacket(data)
 			if err != nil {
 				ctx := log.WithField("data", data)
 				ctx.WithError(err).Error("protocol error")
+			} else {
+				packet.Log(log.Log)
 			}
+
+			//switch p := packet.(type) {
+			//case protocol.PushDataPacket:
+			//}
 		}
 	},
 }

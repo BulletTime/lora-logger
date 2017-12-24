@@ -24,51 +24,57 @@ package protocol
 
 import (
 	"encoding/binary"
+	"fmt"
 
 	"github.com/apex/log"
 	"github.com/pkg/errors"
 )
 
-// PushACKPacket is used by the server to acknowledge immediately all the
-// PUSH_DATA packets received
-type PushAckPacket struct {
+// PullDataPacket is used by the gateway to poll data from the server.
+type PullDataPacket struct {
 	Protocol    uint8
 	RandomToken uint16
+	GatewayMac  [8]byte
 }
 
-func handlePushAck(data []byte) (Packet, error) {
-	var packet PushAckPacket
+func handlePullData(data []byte) (Packet, error) {
+	var packet PullDataPacket
 
 	err := packet.unmarshalData(data)
 	if err != nil {
-		return nil, errors.Wrap(err, "handle push ack packet failed")
+		return nil, errors.Wrap(err, "handle pull data packet failed")
 	}
 
 	return &packet, nil
 }
 
-func (p *PushAckPacket) Log(ctx log.Interface) {
+func (p *PullDataPacket) Log(ctx log.Interface) {
 	ctx.WithFields(log.Fields{
-		"protocol": p.Protocol,
+		"protocol":     p.Protocol,
 		"random token": p.RandomToken,
-	}).Info("PUSH_ACK")
+		"gateway mac":  fmt.Sprintf("%X", p.GatewayMac),
+	}).Info("PULL_DATA")
 }
 
-func (p *PushAckPacket) unmarshalData(data []byte) error {
-	_, err := isValidPushAckPacket(data)
+func (p *PullDataPacket) unmarshalData(data []byte) error {
+	_, err := isValidPullDataPacket(data)
 	if err != nil {
-		return errors.Wrap(err, "unmarshal push ack packet failed")
+		return errors.Wrap(err, "unmarshal pull data packet failed")
 	}
 
 	p.Protocol = data[0]
 	p.RandomToken = binary.LittleEndian.Uint16(data[1:3])
 
+	for i := 0; i < 8; i++ {
+		p.GatewayMac[i] = data[4+i]
+	}
+
 	return nil
 }
 
-func isValidPushAckPacket(data []byte) (bool, error) {
-	if len(data) != 4 {
-		return false, errors.New("invalid packet: 4 bytes expected")
+func isValidPullDataPacket(data []byte) (bool, error) {
+	if len(data) != 12 {
+		return false, errors.New("invalid packet: 12 bytes expected")
 	}
 
 	return true, nil
