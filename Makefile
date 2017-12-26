@@ -4,13 +4,14 @@ COMMIT := $(shell git describe --always)
 GOOS ?= darwin
 GOARCH ?= amd64
 GOPATH ?= $(HOME)/go/
+BUILD_DATE = `date -u +%Y-%m-%dT%H:%M.%SZ`
 
 all: clean build build-arm
 
 build:
 	@echo "Compiling source for $(GOOS) $(GOARCH)"
 	@mkdir -p build
-	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build -a -ldflags "-X main.version=$(VERSION) -X main.build=$(COMMIT)" -o build/lora-logger-$(GOOS)-$(GOARCH)$(BINEXT) main.go
+	@GOOS=$(GOOS) GOARCH=$(GOARCH) go build -a -ldflags "-X main.version=$(VERSION) -X main.build=$(COMMIT) -X main.buildDate=$(BUILD_DATE)" -o build/lora-logger-$(GOOS)-$(GOARCH)$(BINEXT) main.go
 
 build-arm:
 	@echo "Compiling source for linux arm-5"

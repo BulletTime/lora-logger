@@ -23,6 +23,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/apex/log"
@@ -44,13 +45,12 @@ var (
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "lora-logger",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "A logger for traffic from lora packet forwarders",
+	Long: `A logger for traffic from lora packet forwarders.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+This logger can be configured to monitor network traffic and filter out
+the traffic from an active packet forwarder running on the same device.
+It will log the protocol messages to a log file and/or standard output.`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		var logLevel = log.InfoLevel
 		var logHandlers []log.Handler
@@ -78,17 +78,8 @@ to quickly create a Cobra application.`,
 		log.SetHandler(multiHandler.New(logHandlers...))
 		log.SetLevel(logLevel)
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		if version, err := cmd.Flags().GetBool("version"); err == nil && version {
-			fmt.Printf(
-				"Version: %s\nBuild: %s\n",
-				viper.GetString("version"),
-				viper.GetString("build"),
-			)
-		} else {
-			cmd.Help()
-		}
-	},
+	//Run: func(cmd *cobra.Command, args []string) {
+	//},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if logFile != nil {
 			logFile.Close()
@@ -107,17 +98,16 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.lora-logger.yaml)")
-	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print everything that is send to logs")
+	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "print everything to standard output")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "enable debug logs")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	RootCmd.Flags().BoolP("version", "V", false, "build and version info")
+	//RootCmd.Flags().BoolP("version", "V", false, "print build and version info")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -133,9 +123,14 @@ func initConfig() {
 			os.Exit(1)
 		}
 
+		configName := ".lora-logger"
+
 		// Search config in home directory with name ".lora-logger" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".lora-logger")
+		viper.SetConfigName(configName)
+
+		// Add standard path to config file
+		cfgFile = path.Join(home, string(append([]byte(configName), []byte(".yaml")...)))
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

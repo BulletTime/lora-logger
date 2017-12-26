@@ -111,6 +111,12 @@
 			"revisionTime": "2017-10-17T18:19:29Z"
 		},
 		{
+			"checksumSHA1": "K6exl2ouL7d8cR2i378EzZOdRVI=",
+			"path": "github.com/howeyc/gopass",
+			"revision": "bf9dde6d0d2c004a008c27aaee91170c786f6db8",
+			"revisionTime": "2017-01-09T16:22:49Z"
+		},
+		{
 			"checksumSHA1": "40vJyUB4ezQSn/NSadsKEOrudMc=",
 			"path": "github.com/inconshreveable/mousetrap",
 			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
@@ -135,16 +141,22 @@
 			"revisionTime": "2017-10-17T17:18:08Z"
 		},
 		{
-			"checksumSHA1": "RwtoHDKvdR7Gj8bAFeTMlVKpqRA=",
+			"checksumSHA1": "H5wlR62j1Ru5rKRDM9eCb6iUKLA=",
 			"path": "github.com/pelletier/go-toml",
-			"revision": "b8b5e7696574464b2f9bf303a7b37781bb52889f",
-			"revisionTime": "2017-12-18T13:57:16Z"
+			"revision": "0131db6d737cfbbfb678f8b7d92e55e27ce46224",
+			"revisionTime": "2017-12-22T11:45:48Z"
 		},
 		{
 			"checksumSHA1": "xCv4GBFyw07vZkVtKF/XrUnkHRk=",
 			"path": "github.com/pkg/errors",
 			"revision": "e881fd58d78e04cf6d0de1217f8707c8cc2249bc",
 			"revisionTime": "2017-12-16T07:03:16Z"
+		},
+		{
+			"checksumSHA1": "llmzhtIUy63V3Pl65RuEn18ck5g=",
+			"path": "github.com/segmentio/go-prompt",
+			"revision": "f0d19b6901ade831d5a3204edc0d6a7d6457fbb2",
+			"revisionTime": "2016-10-17T23:32:05Z"
 		},
 		{
 			"checksumSHA1": "dW6L6oTOv4XfIahhwNzxb2Qu9to=",
@@ -189,10 +201,22 @@
 			"revisionTime": "2017-12-07T04:26:31Z"
 		},
 		{
-			"checksumSHA1": "tNsJmYVrJzXsDphQvl1Xq/Nhfi4=",
+			"checksumSHA1": "X1NTlfcau2XcV6WtAHF6b/DECOA=",
+			"path": "golang.org/x/crypto/ssh/terminal",
+			"revision": "d585fd2cc9195196078f516b69daff6744ef5e84",
+			"revisionTime": "2017-12-16T04:08:15Z"
+		},
+		{
+			"checksumSHA1": "ZwEZK9AUUeSqDnWUO4fDc9rwTIA=",
 			"path": "golang.org/x/sys/unix",
-			"revision": "d818ba11af4465e00c1998bd3f8a55603b422290",
-			"revisionTime": "2017-12-20T16:06:35Z"
+			"revision": "83801418e1b59fb1880e363299581ee543af32ca",
+			"revisionTime": "2017-12-22T10:59:23Z"
+		},
+		{
+			"checksumSHA1": "du9BFcn4Qlm/4H3jlRBGGH43aQI=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "83801418e1b59fb1880e363299581ee543af32ca",
+			"revisionTime": "2017-12-22T10:59:23Z"
 		},
 		{
 			"checksumSHA1": "ziMb9+ANGRJSSIuxYdRbA+cDRBQ=",

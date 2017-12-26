@@ -18,23 +18,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package main
+package cmd
 
 import (
-	"github.com/bullettime/lora-logger/cmd"
+	"fmt"
+
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var (
-	version = "0.1"
-	build   = "unknown"
-	buildDate = "unknown"
-)
+// versionCmd represents the version command
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Get build and version information",
+	Long: `lora-logger version gets the build and version information of lora-logger`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf(
+			"Version: %s\nBuild: %s\nBuild Date: %s\n",
+			viper.GetString("version"),
+			viper.GetString("build"),
+			viper.GetString("buildDate"),
+		)
+	},
+}
 
-func main() {
-	viper.Set("version", version)
-	viper.Set("build", build)
-	viper.Set("buildDate", buildDate)
+func init() {
+	RootCmd.AddCommand(versionCmd)
 
-	cmd.Execute()
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// versionCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// versionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

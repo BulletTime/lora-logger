@@ -21,6 +21,8 @@
 package cmd
 
 import (
+	"bytes"
+	"strconv"
 	"time"
 
 	"github.com/apex/log"
@@ -28,37 +30,53 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-var (
-	device            = "eth0"
-	snapshotLen int32 = 65535
-	promiscuous       = false
-	err         error
-	timeout     = -1 * time.Second
-	handle      *pcap.Handle
-)
-
-// testCmd represents the test command
-var testCmd = &cobra.Command{
-	Use:   "test",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+// startCmd represents the start command
+var startCmd = &cobra.Command{
+	Use:   "start",
+	Short: "Start logging",
+	Long: `lora-logger start filters the network traffic with the predefined settings (or default)
+from the active packet forwarder and logs this traffic to a log file and/or standard output.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var (
+			device            = viper.GetString("device")
+			host              = viper.GetString("host")
+			port              = viper.GetInt("port")
+			snapshotLen int32 = 65535
+			promiscuous       = viper.GetBool("promiscuous")
+			timeout           = time.Duration(viper.GetInt("timeout")) * time.Second
+			handle      *pcap.Handle
+		)
+		log.WithFields(log.Fields{
+			"device":      device,
+			"host":        host,
+			"port":        port,
+			"promiscuous": promiscuous,
+			"timeout":     timeout,
+		}).Debug("loaded settings")
+
 		// Open device
-		handle, err = pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
+		handle, err := pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
 		if err != nil {
 			log.WithError(err).Fatal("open device failed")
 		}
 		defer handle.Close()
 
 		// Set filter
-		filter := "udp and port 1700"
+		var buffer bytes.Buffer
+		buffer.WriteString("udp")
+		if len(host) > 0 {
+			buffer.WriteString(" and host ")
+			buffer.WriteString(host)
+		}
+		if port != 0 {
+			buffer.WriteString(" and port ")
+			buffer.WriteString(strconv.Itoa(port))
+		}
+		filter := buffer.String()
+		log.WithField("filter", filter).Debug("constructed filter")
 		err = handle.SetBPFFilter(filter)
 		if err != nil {
 			log.WithError(err).Fatal("filter failed")
@@ -84,15 +102,18 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	RootCmd.AddCommand(testCmd)
+	RootCmd.AddCommand(startCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// testCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	viper.SetDefault("device", "eth0")
+	viper.SetDefault("promiscuous", false)
+	viper.SetDefault("timeout", -1)
 }
