@@ -18,7 +18,7 @@ build-arm:
 	@mkdir -p build
 	@mv build .build
 	@$(MAKE) patch
-	@GOPATH=$(GOPATH) xgo -image=svenagn/multitech-libpcap -ldflags "-X main.version=$(VERSION) -X main.build=$(COMMIT)" -out .build/lora-logger --targets=linux/arm-5 .
+	@GOPATH=$(GOPATH) xgo -image=svenagn/multitech-libpcap -ldflags "-X main.version=$(VERSION) -X main.build=$(COMMIT) -X main.buildDate=$(BUILD_DATE)" -out .build/lora-logger --targets=linux/arm-5 .
 	@$(MAKE) unpatch
 	@mv .build build
 
