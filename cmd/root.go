@@ -28,18 +28,20 @@ import (
 
 	"github.com/apex/log"
 	cliHandler "github.com/apex/log/handlers/cli"
+	jsonHandler "github.com/apex/log/handlers/json"
+	textHandler "github.com/apex/log/handlers/logfmt"
 	multiHandler "github.com/apex/log/handlers/multi"
-	textHandler "github.com/apex/log/handlers/text"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	cfgFile string
-	logFile *os.File
-	verbose bool
-	debug bool
+	cfgFile  string
+	logFile  *os.File
+	jsonFile *os.File
+	verbose  bool
+	debug    bool
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -75,6 +77,18 @@ It will log the protocol messages to a log file and/or standard output.`,
 			logHandlers = append(logHandlers, textHandler.New(logFile))
 		}
 
+		absJSONFileLocation, err := filepath.Abs("lora.json")
+		if err != nil {
+			panic(err)
+		}
+		jsonFile, err = os.OpenFile(absJSONFileLocation, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+		if err != nil {
+			panic(err)
+		}
+		if err == nil {
+			logHandlers = append(logHandlers, jsonHandler.New(jsonFile))
+		}
+
 		log.SetHandler(multiHandler.New(logHandlers...))
 		log.SetLevel(logLevel)
 	},
@@ -83,6 +97,10 @@ It will log the protocol messages to a log file and/or standard output.`,
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if logFile != nil {
 			logFile.Close()
+		}
+
+		if jsonFile != nil {
+			jsonFile.Close()
 		}
 	},
 }

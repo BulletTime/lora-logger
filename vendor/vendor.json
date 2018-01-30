@@ -3,14 +3,26 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "gt4qjONr5JL9rMCJuEznegBkh5o=",
+			"checksumSHA1": "4IearLMTAsdyT2kExofJKklO7k4=",
 			"path": "github.com/apex/log",
-			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
-			"revisionTime": "2017-07-26T18:07:45Z"
+			"revision": "ff0f66940b829dc66c81dad34746d4349b83eb9e",
+			"revisionTime": "2018-01-18T05:06:19Z"
 		},
 		{
 			"checksumSHA1": "Nh2uyucrB2Iuo56IqTdwrziOQyU=",
 			"path": "github.com/apex/log/handlers/cli",
+			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
+			"revisionTime": "2017-07-26T18:07:45Z"
+		},
+		{
+			"checksumSHA1": "rkMrOC6qQhEkDCYmmUErg8qvjGA=",
+			"path": "github.com/apex/log/handlers/json",
+			"revision": "ff0f66940b829dc66c81dad34746d4349b83eb9e",
+			"revisionTime": "2018-01-18T05:06:19Z"
+		},
+		{
+			"checksumSHA1": "zhtGWHwacYwQegB631vW71LzEZ4=",
+			"path": "github.com/apex/log/handlers/logfmt",
 			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
 			"revisionTime": "2017-07-26T18:07:45Z"
 		},
@@ -21,16 +33,16 @@
 			"revisionTime": "2017-07-26T18:07:45Z"
 		},
 		{
-			"checksumSHA1": "+urkX0ZY02ty7TvsBsYzcboRxVg=",
-			"path": "github.com/apex/log/handlers/text",
-			"revision": "0296d6eb16bb28f8a0c55668affcf4876dc269be",
-			"revisionTime": "2017-07-26T18:07:45Z"
-		},
-		{
 			"checksumSHA1": "x2Km0Qy3WgJJnV19Zv25VwTJcBM=",
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "4da3e2cfbabc9f751898f250b49f2439785783a1",
 			"revisionTime": "2017-03-29T04:21:07Z"
+		},
+		{
+			"checksumSHA1": "KxX/Drph+byPXBFIXaCZaCOAnrU=",
+			"path": "github.com/go-logfmt/logfmt",
+			"revision": "390ab7935ee28ec6b286364bba9b4dd6410cb3d5",
+			"revisionTime": "2016-11-15T14:25:13Z"
 		},
 		{
 			"checksumSHA1": "Uaj9uu59It0BlmgsFa0ZO3zEjrE=",
@@ -123,6 +135,12 @@
 			"revisionTime": "2014-10-17T20:07:13Z"
 		},
 		{
+			"checksumSHA1": "abKzFXAn0KDr5U+JON1ZgJ2lUtU=",
+			"path": "github.com/kr/logfmt",
+			"revision": "b84e30acd515aadc4b783ad4ff83aff3299bdfe0",
+			"revisionTime": "2014-02-26T03:06:59Z"
+		},
+		{
 			"checksumSHA1": "8ae1DyNE/yY9NvY3PmvtQdLBJnc=",
 			"path": "github.com/magiconair/properties",
 			"revision": "49d762b9817ba1c2e9d0c69183c2b4a8b8f1d934",
@@ -147,10 +165,10 @@
 			"revisionTime": "2017-12-22T11:45:48Z"
 		},
 		{
-			"checksumSHA1": "xCv4GBFyw07vZkVtKF/XrUnkHRk=",
+			"checksumSHA1": "ljd3FhYRJ91cLZz3wsH9BQQ2JbA=",
 			"path": "github.com/pkg/errors",
-			"revision": "e881fd58d78e04cf6d0de1217f8707c8cc2249bc",
-			"revisionTime": "2017-12-16T07:03:16Z"
+			"revision": "30136e27e2ac8d167177e8a583aa4c3fea5be833",
+			"revisionTime": "2018-01-27T01:58:12Z"
 		},
 		{
 			"checksumSHA1": "llmzhtIUy63V3Pl65RuEn18ck5g=",

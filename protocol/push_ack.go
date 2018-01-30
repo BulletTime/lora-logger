@@ -49,7 +49,7 @@ func handlePushAck(data []byte) (Packet, error) {
 
 func (p *PushAckPacket) Log(ctx log.Interface) {
 	ctx.WithFields(log.Fields{
-		"protocol": p.Protocol,
+		"protocol":     p.Protocol,
 		"random token": p.RandomToken,
 	}).Info("PUSH_ACK")
 }
