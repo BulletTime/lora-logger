@@ -166,11 +166,11 @@ func handlePushData(data []byte) (Packet, error) {
 }
 
 func (p *PushDataPacket) Log(ctx log.Interface) {
-	ctx.WithFields(log.Fields{
+	ctx = ctx.WithFields(log.Fields{
 		"protocol":     p.Protocol,
 		"random token": p.RandomToken,
 		"gateway mac":  fmt.Sprintf("%X", p.GatewayMac),
-	}).Info("PUSH_DATA")
+	})
 
 	for _, rxpk := range p.Payload.RXPK {
 		ctx.WithFields(log.Fields{
