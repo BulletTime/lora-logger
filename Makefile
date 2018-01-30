@@ -1,5 +1,5 @@
 .PHONY: all build build-arm patch unpatch clean test
-VERSION := 0.2
+VERSION := 0.3
 COMMIT := $(shell git describe --always)
 GOOS ?= darwin
 GOARCH ?= amd64
